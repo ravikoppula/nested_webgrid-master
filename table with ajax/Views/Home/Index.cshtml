@@ -1,0 +1,96 @@
+﻿@model User
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
+
+<style>
+    td.details-control {
+        background: url('../images/arrow side.png') no-repeat center center;
+        cursor: pointer;
+    }
+
+    tr.shown td.details-control {
+        background: url('../images/arrow down.png') no-repeat center center;
+    }
+</style>
+
+<div class="text-center">
+ 
+    <table id="userTable" class="display" style="width:100%">
+        <thead>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+
+
+       var table = $('#userTable').DataTable({
+            "processing": true, // for show progress bar    
+            //"serverSide": true, // for process server side    
+            "filter": true, // this is for disable filter (search box)    
+            "orderMulti": false, // for disable multiple column at once 
+            "ajax": {
+                'url': '@Url.Action("getAllUsers", "Home")',
+                "type": "GET",
+                "datatype": "json"
+               
+            },
+            "columns": [
+                {
+                    "className": 'details-control',
+                    "orderable": false,
+                    "data": null,
+                    "defaultContent": ''
+                },
+                { "sTitle": "First Name",  "data": "firstName"},
+                { "sTitle": "Last Name",   "data": "lastName" },
+                { "sTitle": "Middle Name", "data": "middleName" }
+            ]
+        });
+
+        // Add event listener for opening and closing details
+        $('#userTable tbody').on('click', 'td.details-control', function () {
+            var tr = $(this).closest('tr');
+            var row = table.row(tr);
+
+            if (row.child.isShown()) {
+                // This row is already open - close it
+                row.child.hide();
+                tr.removeClass('shown');
+            } else {
+                // Open this row
+                row.child(child_Table(row.data())).show();
+                tr.addClass('shown');
+            }
+        });
+
+
+        function child_Table(data) {
+           
+            return '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">' +
+                '<tr>' +
+                '<td>Full Name:</td>' +
+                '<td>' + data.firstName + ' ' + data.lastName + '</td>' +
+                '</tr>' +
+                '<tr>' +
+                '<td>Contact:</td>' +
+                '<td>' + data.contact + '</td>' +
+                '</tr>' +
+                '</table>';
+        }
+
+    });
+</script>
